@@ -133,7 +133,7 @@
               </el-row>
               <Space height="20" />
               <el-row justify="center">
-                <el-pagination v-model:currentPage="currentPage" v-model:page-size="pageSize" :page-sizes="[100, 200, 300, 400]" :small="small" :background="true" layout="total, sizes, prev, pager, next, jumper" :total="400" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+                <el-pagination v-model:currentPage="currentPage" v-model:page-size="pageSize" :page-sizes="[100, 200, 300, 400]" :background="true" layout="total, sizes, prev, pager, next, jumper" :total="400" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
               </el-row>
               <Space height="20" />
             </el-col>
@@ -166,69 +166,112 @@
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-import { reactive, ref } from "vue";
+<script lang="ts">
+import {
+  reactive,
+  ref,
+  onMounted,
+  onBeforeUnmount,
+  defineComponent,
+  toRefs,
+} from "vue";
+import { getJobList } from "@/http/service";
 import HeaderLayout from "@/components/HeaderLayout.vue";
 import Space from "@/components/Space.vue";
-const scollTop = ref(0);
-const scrollEvent = (val: unknown) => {
-  console.log(`${val} scrollEvent`);
-  scollTop.value =
-    window.pageYOffset ||
-    document.documentElement.scrollTop ||
-    document.body.scrollTop;
-};
-window.addEventListener("scroll", scrollEvent);
-const activeName = ref("first");
-const currentPage = ref(4);
-const pageSize = ref(100);
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`);
-};
-const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`);
-};
-const options = [
-  {
-    value: "Option1",
-    label: "Option1",
+export default defineComponent({
+  components: {
+    HeaderLayout,
+    Space,
   },
-  {
-    value: "Option2",
-    label: "Option2",
-  },
-  {
-    value: "Option3",
-    label: "Option3",
-  },
-  {
-    value: "Option4",
-    label: "Option4",
-  },
-  {
-    value: "Option5",
-    label: "Option5",
-  },
-];
-const dynamicTags = ref(["Tag 1", "Tag 2", "Tag 3"]);
-const handleClose = (tag: string) => {
-  dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
-};
-// do not use same name with ref
-// const form = reactive({
-//   name: "",
-//   region: "",
-//   date1: "",
-//   date2: "",
-//   delivery: false,
-//   type: [],
-//   resource: "",
-//   desc: "",
-// });
+  setup() {
+    const data = reactive({ input: String(""), value: String(""),checked1:Number(1),checked2:Number(2) });
+    const scollTop = ref(0);
+    const scrollEvent = (val: unknown) => {
+      console.log(`${val} scrollEvent`);
+      scollTop.value =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop;
+    };
+    onMounted(() => {
+      getJobList({}).then((res: any) => {
+        console.log(res);
+      });
+      console.log("组件安装");
+      window.addEventListener("scroll", scrollEvent);
+    });
+    onBeforeUnmount(() => {
+      console.log("组件卸载");
+      window.removeEventListener("scroll", scrollEvent);
+    });
+    const activeName = ref("first");
+    const currentPage = ref(4);
+    const pageSize = ref(100);
+    const handleSizeChange = (val: number) => {
+      console.log(`${val} items per page`);
+    };
+    const handleCurrentChange = (val: number) => {
+      console.log(`current page: ${val}`);
+    };
+    const options = [
+      {
+        value: "Option1",
+        label: "Option1",
+      },
+      {
+        value: "Option2",
+        label: "Option2",
+      },
+      {
+        value: "Option3",
+        label: "Option3",
+      },
+      {
+        value: "Option4",
+        label: "Option4",
+      },
+      {
+        value: "Option5",
+        label: "Option5",
+      },
+    ];
+    const dynamicTags = ref(["Tag 1", "Tag 2", "Tag 3"]);
+    const handleClose = (tag: string) => {
+      dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
+    };
+    const handleClick = (val: any) => {
+      console.log(val);
+    };
+    // do not use same name with ref
+    // const form = reactive({
+    //   name: "",
+    //   region: "",
+    //   date1: "",
+    //   date2: "",
+    //   delivery: false,
+    //   type: [],
+    //   resource: "",
+    //   desc: "",
+    // });
 
-// const onSubmit = () => {
-//   console.log("submit!");
-// };
+    // const onSubmit = () => {
+    //   console.log("submit!");
+    // };
+    return {
+      ...toRefs(data),
+      activeName,
+      scollTop,
+      currentPage,
+      pageSize,
+      options,
+      dynamicTags,
+      handleSizeChange,
+      handleCurrentChange,
+      handleClose,
+      handleClick,
+    };
+  },
+});
 </script>
 <style lang="scss" scoped>
 .index-page {
