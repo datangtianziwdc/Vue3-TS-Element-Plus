@@ -25,7 +25,7 @@
         <Space width="200" />
       </template>
       <template #right>
-        <el-button type="primary" size="large" color="#626aef">发布招聘</el-button>
+        <el-button type="primary" size="large" color="#626aef" @click="toRelese">发布招聘</el-button>
       </template>
     </HeaderLayout>
     <!-- 分类 -->
@@ -35,7 +35,7 @@
         <div>大连58同城</div>
         <Space width="20" />
         <el-select v-model="value" placeholder="全职招聘">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+          <el-option v-for="item in selectkeyOption" :key="item.key" :label="item.name" :value="item.input">
           </el-option>
         </el-select>
       </el-row>
@@ -101,24 +101,23 @@
           </el-row>
           <el-row justify="space-between" align="top" :gutter="40">
             <el-col :span="20">
-              <el-row v-for="item in 10" :key="item" justify="space-between" align="middle" class="item-container">
+              <el-row v-for="item in jobList" :key="item.id" justify="space-between" align="middle" class="item-container">
                 <el-col :span="9">
-                  <div>高新园区 | 软件工程师</div>
+                  <div>{{ item.area }} | {{ item.title }}</div>
                   <Space height="10" />
-                  <div class="font-color-them">6000-9000元/月</div>
+                  <div class="font-color-them">{{ item.salaryStart }}-{{ item.salaryEnd }}/月</div>
                   <Space height="10" />
                   <el-row>
-                    <el-tag type="info">求职保障</el-tag>
-                    <Space width="10" />
-                    <el-tag type="info">五险一金</el-tag>
-                    <Space width="10" />
-                    <el-tag type="info">求职保障</el-tag>
+                    <el-row v-for="i in item.tag" :key="i.id">
+                      <el-tag type="info">{{ i.name }}</el-tag>
+                      <Space width="10" />
+                    </el-row>
                   </el-row>
                 </el-col>
                 <el-col :span="9">
-                  <div>武汉佰钧成技术有限责任公司</div>
+                  <div>{{ item.companyName }}</div>
                   <Space height="20" />
-                  <div>UI设计 | 不限 | 不限</div>
+                  <div><span v-for="(j,Idx) in item.workTag" :key="j.id">{{ (item.workTag.length>1&&Idx!==0)?"/":"" }}{{ j.name }}</span> | {{ item.ageLimit }} | {{ item.yearLimit }}</div>
                 </el-col>
                 <el-col :span="6">
                   <el-row align="middle">
@@ -137,6 +136,7 @@
               </el-row>
               <Space height="20" />
             </el-col>
+            <!-- 广告区域 -->
             <el-col :span="4" class="ad-container">
               <div class="ad-image">
                 <img src="https://pic1.58cdn.com.cn/nowater/jltx/n_v241c8e2b5869240c19fc91442b19b0827.jpg" alt="">
@@ -145,7 +145,7 @@
                 <img src="https://pic1.58cdn.com.cn/nowater/cxnomark/n_v24e56c94d23bc49c1b9a208fbed4e57ae.png" alt="">
               </div>
               <div class="ad-title">更适合您的职位</div>
-              <div v-for="item in 4" :key="item" class="ad-item">
+              <div v-for="item in recommendList" :key="item.id" class="ad-item">
                 <div>送餐员日均三五百元子</div>
                 <Space height="8" />
                 <div>甘井子区-迎客...</div>
@@ -175,16 +175,27 @@ import {
   defineComponent,
   toRefs,
 } from "vue";
-import { getJobList } from "@/http/service";
+import { getJobList,getRecommendList } from "@/http/service";
 import HeaderLayout from "@/components/HeaderLayout.vue";
 import Space from "@/components/Space.vue";
+import {useRouter} from "vue-router";
+import { dataInter, selectkeyOptionInter,response } from "./IndexInter";
 export default defineComponent({
   components: {
     HeaderLayout,
     Space,
   },
   setup() {
-    const data = reactive({ input: String(""), value: String(""),checked1:Number(1),checked2:Number(2) });
+    const data = reactive(new dataInter());
+    //   new dataInter()
+    //   //   {
+    //   //   input: String(""),
+    //   //   value: String(""),
+    //   //   checked1: Number(1),
+    //   //   checked2: Number(2),
+    //   // }
+    // );
+    const dataList = reactive([]);
     const scollTop = ref(0);
     const scrollEvent = (val: unknown) => {
       console.log(`${val} scrollEvent`);
@@ -194,8 +205,11 @@ export default defineComponent({
         document.body.scrollTop;
     };
     onMounted(() => {
-      getJobList({}).then((res: any) => {
-        console.log(res);
+      getJobList({}).then((res: response) => {
+        data.jobList = res.data;
+        return getRecommendList({})
+      }).then((res: any) => {
+        data.recommendList = res.data;
       });
       console.log("组件安装");
       window.addEventListener("scroll", scrollEvent);
@@ -213,62 +227,50 @@ export default defineComponent({
     const handleCurrentChange = (val: number) => {
       console.log(`current page: ${val}`);
     };
-    const options = [
+    const selectkeyOption: Array<selectkeyOptionInter> = [
       {
-        value: "Option1",
-        label: "Option1",
+        key: "Option1",
+        name: "Option1",
+        input: "",
       },
       {
-        value: "Option2",
-        label: "Option2",
+        key: "Option2",
+        name: "Option2",
+        input: "",
       },
       {
-        value: "Option3",
-        label: "Option3",
-      },
-      {
-        value: "Option4",
-        label: "Option4",
-      },
-      {
-        value: "Option5",
-        label: "Option5",
+        key: "Option3",
+        name: "Option3",
+        input: "",
       },
     ];
-    const dynamicTags = ref(["Tag 1", "Tag 2", "Tag 3"]);
+    const dynamicTags = ref(["硬件", "成都", "包住"]);
     const handleClose = (tag: string) => {
       dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
     };
     const handleClick = (val: any) => {
       console.log(val);
     };
-    // do not use same name with ref
-    // const form = reactive({
-    //   name: "",
-    //   region: "",
-    //   date1: "",
-    //   date2: "",
-    //   delivery: false,
-    //   type: [],
-    //   resource: "",
-    //   desc: "",
-    // });
 
-    // const onSubmit = () => {
-    //   console.log("submit!");
-    // };
+    const router = useRouter();
+
+    const toRelese = () => {
+      return router.push('/relese');
+    };
     return {
       ...toRefs(data),
       activeName,
       scollTop,
       currentPage,
       pageSize,
-      options,
+      selectkeyOption,
       dynamicTags,
+      dataList,
       handleSizeChange,
       handleCurrentChange,
       handleClose,
       handleClick,
+      toRelese
     };
   },
 });

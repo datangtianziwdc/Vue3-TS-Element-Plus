@@ -8,6 +8,7 @@ enum MSGS {
 }
 
 const $http = axios.create({
+    baseURL:'/mock',
     timeout: 5000,
     headers: {
         "Content-Type": "application/json;charset=utf-8"
@@ -21,8 +22,8 @@ $http.interceptors.request.use(config => {
 })
 // 定义响应拦截器
 $http.interceptors.response.use(res => {
+    console.log('响应数据',res.data);
     const code:number = res.data.code;
-    console.log('res.data.code',res)
     if (code !== 200) {
         ElMessage({
             message: MSGS[code],
