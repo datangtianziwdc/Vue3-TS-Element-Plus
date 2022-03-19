@@ -30,6 +30,8 @@ module.exports = {
         'vue/require-default-prop':[0],
         'eslintvue/multi-word-component-names':[0],
         'vue/singleline-html-element-content-newline':[0],
-        'vue/multi-word-component-names':[0]
+        'vue/multi-word-component-names':[0],
+        // '@typescript-eslint/no-inferrable-types':[0]
+        '@typescript-eslint/no-explicit-any':[0]
     }
 }

@@ -32,9 +32,9 @@
     <div class="classify">
       <!-- 下拉 -->
       <el-row align="middle">
-        <div>大连58同城</div>
+        <div>大连</div>
         <Space width="20" />
-        <el-select v-model="value" placeholder="全职招聘">
+        <el-select v-model="selectValue" placeholder="筛选">
           <el-option v-for="item in selectkeyOption" :key="item.key" :label="item.name" :value="item.input">
           </el-option>
         </el-select>
@@ -44,33 +44,37 @@
       <el-row align="middle">
         <div>职位：</div>
         <Space width="10" />
-        <div>职位：</div>
-        <div>职位：</div>
+        <el-row v-for="item in position" :key="item.id">
+          <div :class="[item.value?'font-color-them pointer':'pointer']">{{ item.label }}</div>
+          <Space width="10" />
+        </el-row>
       </el-row>
       <Space height="10" />
       <!-- 地点 -->
       <el-row align="middle">
         <div>地点：</div>
         <Space width="10" />
-        <div>地点</div>
-        <div>地点</div>
+        <el-row v-for="item in addressList" :key="item.id">
+          <div :class="[item.value?'font-color-them pointer':'pointer']">{{ item.label }}</div>
+          <Space width="10" />
+        </el-row>
       </el-row>
       <Space height="10" />
       <!-- 其他 -->
       <el-row align="middle">
         <div>其他：</div>
         <Space width="10" />
-        <el-select v-model="value" placeholder="发布时间">
+        <el-select v-model="createTime" placeholder="发布时间">
           <el-option label="发布时间" value="2022">
           </el-option>
         </el-select>
         <Space width="10" />
-        <el-select v-model="value" placeholder="薪资范围">
+        <el-select v-model="range" placeholder="薪资范围">
           <el-option label="薪资范围" value="2022">
           </el-option>
         </el-select>
         <Space width="10" />
-        <el-select v-model="value" placeholder="公司性质">
+        <el-select v-model="nature" placeholder="公司性质">
           <el-option label="公司性质" value="2022">
           </el-option>
         </el-select>
@@ -96,8 +100,7 @@
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="职位" name="first">
           <el-row>
-            <el-checkbox v-model="checked1" label="查看本地工作" size="large"></el-checkbox>
-            <el-checkbox v-model="checked2" label="营业执照已验证" size="large"></el-checkbox>
+            <el-checkbox v-for="(item,index) in checkedList" :key="item.id" v-model="checkedList[index].value" :label="item.label" size="large"></el-checkbox>
           </el-row>
           <el-row justify="space-between" align="top" :gutter="40">
             <el-col :span="20">
@@ -175,11 +178,11 @@ import {
   defineComponent,
   toRefs,
 } from "vue";
-import { getJobList,getRecommendList } from "@/http/service";
+import { getJobList, getRecommendList } from "@/http/service";
 import HeaderLayout from "@/components/HeaderLayout.vue";
 import Space from "@/components/Space.vue";
-import {useRouter} from "vue-router";
-import { dataInter, selectkeyOptionInter,response } from "./IndexInter";
+import { useRouter } from "vue-router";
+import { dataInter, selectkeyOptionInter, response,selectTypeInter } from "./IndexInter";
 export default defineComponent({
   components: {
     HeaderLayout,
@@ -187,14 +190,6 @@ export default defineComponent({
   },
   setup() {
     const data = reactive(new dataInter());
-    //   new dataInter()
-    //   //   {
-    //   //   input: String(""),
-    //   //   value: String(""),
-    //   //   checked1: Number(1),
-    //   //   checked2: Number(2),
-    //   // }
-    // );
     const dataList = reactive([]);
     const scollTop = ref(0);
     const scrollEvent = (val: unknown) => {
@@ -205,12 +200,14 @@ export default defineComponent({
         document.body.scrollTop;
     };
     onMounted(() => {
-      getJobList({}).then((res: response) => {
-        data.jobList = res.data;
-        return getRecommendList({})
-      }).then((res: any) => {
-        data.recommendList = res.data;
-      });
+      getJobList({})
+        .then((res: response) => {
+          data.jobList = res.data;
+          return getRecommendList({});
+        })
+        .then((res: any) => {
+          data.recommendList = res.data;
+        });
       console.log("组件安装");
       window.addEventListener("scroll", scrollEvent);
     });
@@ -229,19 +226,19 @@ export default defineComponent({
     };
     const selectkeyOption: Array<selectkeyOptionInter> = [
       {
-        key: "Option1",
-        name: "Option1",
-        input: "",
+        key: "1",
+        name: "本地",
+        input: "1",
       },
       {
-        key: "Option2",
-        name: "Option2",
-        input: "",
+        key: "2",
+        name: "同城",
+        input: "2",
       },
       {
-        key: "Option3",
-        name: "Option3",
-        input: "",
+        key: "3",
+        name: "附近",
+        input: "3",
       },
     ];
     const dynamicTags = ref(["硬件", "成都", "包住"]);
@@ -251,11 +248,17 @@ export default defineComponent({
     const handleClick = (val: any) => {
       console.log(val);
     };
+    // 解决方案！重要
+    const setKey = (str:string,val:string):void=>{
+      const sk:keyof selectTypeInter = val as keyof selectTypeInter;
+      const v:never = str as never
+      data.selectType[sk] = v;
+    }
 
     const router = useRouter();
 
     const toRelese = () => {
-      return router.push('/relese');
+      return router.push("/relese");
     };
     return {
       ...toRefs(data),
@@ -270,7 +273,8 @@ export default defineComponent({
       handleCurrentChange,
       handleClose,
       handleClick,
-      toRelese
+      toRelese,
+      setKey
     };
   },
 });
