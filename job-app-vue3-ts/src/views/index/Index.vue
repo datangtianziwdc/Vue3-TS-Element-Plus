@@ -200,7 +200,7 @@ export default defineComponent({
         document.body.scrollTop;
     };
     onMounted(() => {
-      getJobList({})
+      getJobList({page:1,limit:10})
         .then((res: response) => {
           data.jobList = res.data;
           return getRecommendList({});

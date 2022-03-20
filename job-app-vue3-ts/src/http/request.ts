@@ -8,7 +8,7 @@ enum MSGS {
 }
 
 const $http = axios.create({
-    baseURL:'/mock',
+    baseURL:process.env.VUE_APP_BASE_URL,
     timeout: 5000,
     headers: {
         "Content-Type": "application/json;charset=utf-8"

@@ -1,5 +1,5 @@
 import Mock from "mockjs"
-Mock.mock("/mock/JobList", "get", {
+Mock.mock(/\/mock\/JobList.*/, "get", {
     code: 200,
     data: [{
         id: 1,
@@ -114,7 +114,7 @@ Mock.mock("/mock/JobList", "get", {
     },
     ]
 })
-Mock.mock("/mock/RecommendList", "get", {
+Mock.mock(/\/mock\/RecommendList.*/, "get", {
     code: 200,
     data: [{
         id: 1,
