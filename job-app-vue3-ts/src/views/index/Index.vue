@@ -7,7 +7,7 @@
           <el-input v-model="input" placeholder="招聘季月薪10000+" />
         </el-col>
         <el-col :span="6">
-          <el-button type="primary" color="#626aef">搜索</el-button>
+          <el-button type="primary" color="#626aef" @click="clickHandle('search')">搜索</el-button>
         </el-col>
         <el-col :span="6">
           <el-row align="middle" justify="end">
@@ -18,11 +18,12 @@
     </div>
     <HeaderLayout>
       <template #center>
-        <Space width="200" />
+        <Space width="200" class="PC" />
         <el-input v-model="input" placeholder="招聘季月薪10000+" size="large" />
         <Space width="20" />
-        <el-button type="primary" size="large" color="#626aef">搜索</el-button>
-        <Space width="200" />
+        <el-button type="primary" size="large" color="#626aef" @click="clickHandle('search')">搜索</el-button>
+        <Space width="200" class="PC" />
+        <Space width="20" class="MOVE" />
       </template>
       <template #right>
         <el-button type="primary" size="large" color="#626aef" @click="toRelese">发布招聘</el-button>
@@ -45,7 +46,7 @@
         <div>职位：</div>
         <Space width="10" />
         <el-row v-for="item in position" :key="item.id">
-          <div :class="[item.value?'font-color-them pointer':'pointer']">{{ item.label }}</div>
+          <div :class="[positionIndex === item.id?'font-color-them pointer':'pointer']" @click="clickHandle('position',item)">{{ item.label }}</div>
           <Space width="10" />
         </el-row>
       </el-row>
@@ -55,7 +56,7 @@
         <div>地点：</div>
         <Space width="10" />
         <el-row v-for="item in addressList" :key="item.id">
-          <div :class="[item.value?'font-color-them pointer':'pointer']">{{ item.label }}</div>
+          <div :class="[addressIndex === item.id?'font-color-them pointer':'pointer']" @click="clickHandle('address',item)">{{ item.label }}</div>
           <Space width="10" />
         </el-row>
       </el-row>
@@ -63,18 +64,19 @@
       <!-- 其他 -->
       <el-row align="middle">
         <div>其他：</div>
-        <Space width="10" />
-        <el-select v-model="createTime" placeholder="发布时间">
+        <Space width="10" class="PC" />
+        <Space width="200" class="MOVE" />
+        <el-select v-model="createTime" placeholder="发布时间" class="selectStyle">
           <el-option label="发布时间" value="2022">
           </el-option>
         </el-select>
-        <Space width="10" />
-        <el-select v-model="range" placeholder="薪资范围">
+        <Space width="10" class="PC" />
+        <el-select v-model="range" placeholder="薪资范围" class="selectStyle">
           <el-option label="薪资范围" value="2022">
           </el-option>
         </el-select>
-        <Space width="10" />
-        <el-select v-model="nature" placeholder="公司性质">
+        <Space width="10" class="PC" />
+        <el-select v-model="nature" placeholder="公司性质" class="selectStyle">
           <el-option label="公司性质" value="2022">
           </el-option>
         </el-select>
@@ -103,7 +105,7 @@
             <el-checkbox v-for="(item,index) in checkedList" :key="item.id" v-model="checkedList[index].value" :label="item.label" size="large"></el-checkbox>
           </el-row>
           <el-row justify="space-between" align="top" :gutter="40">
-            <el-col :span="20">
+            <el-col :span="20" :xs="{span: 24}">
               <el-row v-for="item in jobList" :key="item.id" justify="space-between" align="middle" class="item-container">
                 <el-col :span="9">
                   <div>{{ item.area }} | {{ item.title }}</div>
@@ -117,30 +119,33 @@
                     </el-row>
                   </el-row>
                 </el-col>
-                <el-col :span="9">
+                <el-col :span="9" :xs="{span:10}">
                   <div>{{ item.companyName }}</div>
                   <Space height="20" />
                   <div><span v-for="(j,Idx) in item.workTag" :key="j.id">{{ (item.workTag.length>1&&Idx!==0)?"/":"" }}{{ j.name }}</span> | {{ item.ageLimit }} | {{ item.yearLimit }}</div>
                 </el-col>
-                <el-col :span="6">
+                <el-col :span="6" :xs="{span:5}">
                   <el-row align="middle">
-                    <el-col :span="14">
+                    <el-col :span="14" :xs="{span:24}">
                       <el-button type="primary" size="large" color="#626aef">申请</el-button>
                     </el-col>
-                    <el-col :span="10">
+                    <el-col :span="10" class="hidden-sm-and-down">
                       <div>黄金展位</div>
                     </el-col>
                   </el-row>
                 </el-col>
               </el-row>
               <Space height="20" />
-              <el-row justify="center">
+              <el-row justify="center" class="PC">
                 <el-pagination v-model:currentPage="currentPage" v-model:page-size="pageSize" :page-sizes="[100, 200, 300, 400]" :background="true" layout="total, sizes, prev, pager, next, jumper" :total="400" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+              </el-row>
+              <el-row justify="center" class="MOVE">
+                <el-pagination v-model:currentPage="currentPage" v-model:page-size="pageSize" :background="true" layout="prev, pager, next" :total="400" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
               </el-row>
               <Space height="20" />
             </el-col>
             <!-- 广告区域 -->
-            <el-col :span="4" class="ad-container">
+            <el-col :span="4" class="ad-container hidden-sm-and-down">
               <div class="ad-image">
                 <img src="https://pic1.58cdn.com.cn/nowater/jltx/n_v241c8e2b5869240c19fc91442b19b0827.jpg" alt="">
               </div>
@@ -164,12 +169,20 @@
             </el-col>
           </el-row>
         </el-tab-pane>
-        <el-tab-pane label="名企" name="second">名企</el-tab-pane>
+        <el-tab-pane label="名企" name="second">
+          <div class="PC">
+            <el-empty :image-size="200" />
+          </div>
+          <div class="MOVE">
+            <el-empty :image-size="100" />
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </div>
   </div>
 </template>
 <script lang="ts">
+import "element-plus/theme-chalk/display.css";
 import {
   reactive,
   ref,
@@ -182,7 +195,13 @@ import { getJobList, getRecommendList } from "@/http/service";
 import HeaderLayout from "@/components/HeaderLayout.vue";
 import Space from "@/components/Space.vue";
 import { useRouter } from "vue-router";
-import { dataInter, selectkeyOptionInter, response,selectTypeInter } from "./IndexInter";
+import {
+  dataInter,
+  selectkeyOptionInter,
+  response,
+  selectTypeInter,
+} from "./IndexInter";
+import { ElMessageBox } from "element-plus";
 export default defineComponent({
   components: {
     HeaderLayout,
@@ -200,7 +219,7 @@ export default defineComponent({
         document.body.scrollTop;
     };
     onMounted(() => {
-      getJobList({page:1,limit:10})
+      getJobList({ page: 1, limit: 10 })
         .then((res: response) => {
           data.jobList = res.data;
           return getRecommendList({});
@@ -249,16 +268,32 @@ export default defineComponent({
       console.log(val);
     };
     // 解决方案！重要
-    const setKey = (str:string,val:string):void=>{
-      const sk:keyof selectTypeInter = val as keyof selectTypeInter;
-      const v:never = str as never
+    const setKey = (str: string, val: string): void => {
+      const sk: keyof selectTypeInter = val as keyof selectTypeInter;
+      const v: never = str as never;
       data.selectType[sk] = v;
-    }
+    };
 
     const router = useRouter();
 
     const toRelese = () => {
       return router.push("/relese");
+    };
+    const clickHandle = (type: string,item?: { id: number }) => {
+      console.log("clickHandle",type);
+      switch (type) {
+        case "position":
+          item?data.positionIndex = item.id:1;
+          break;
+        case "address":
+          item?data.addressIndex = item.id:1;
+          break;
+        case "search":
+          ElMessageBox.alert("不好意思帅哥不能搜索", "提示", {
+            confirmButtonText: "滚",
+          });
+          break;
+      }
     };
     return {
       ...toRefs(data),
@@ -274,7 +309,8 @@ export default defineComponent({
       handleClose,
       handleClick,
       toRelese,
-      setKey
+      setKey,
+      clickHandle,
     };
   },
 });
@@ -284,6 +320,12 @@ export default defineComponent({
   position: relative;
   width: 60%;
   left: 20%;
+  .PC {
+    display: block;
+  }
+  .MOVE {
+    display: none;
+  }
   .header {
     color: white;
     position: fixed;
@@ -330,6 +372,29 @@ export default defineComponent({
       &:hover {
         background-color: rgba($color: #b8b3b3, $alpha: 0.1);
       }
+    }
+  }
+}
+@media screen and (max-width: 726px) {
+  .index-page {
+    position: relative;
+    width: 90%;
+    left: 5%;
+    .PC {
+      display: none;
+    }
+    .MOVE {
+      display: block;
+    }
+    .selectStyle {
+      margin-top: 5px;
+    }
+    .header {
+      padding: 10px 5%;
+      font-size: 12px;
+    }
+    .item-container {
+      padding: 5px;
     }
   }
 }

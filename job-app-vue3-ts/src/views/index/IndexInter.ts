@@ -47,6 +47,8 @@ export interface checkedList {
 }
 
 export class dataInter {
+    positionIndex = 1;
+    addressIndex = 1;
     position: Array<checkedList> = [{
         label: "全部",
         id: 1,

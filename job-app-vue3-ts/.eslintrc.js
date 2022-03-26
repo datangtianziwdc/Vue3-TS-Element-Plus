@@ -33,5 +33,10 @@ module.exports = {
         'vue/multi-word-component-names':[0],
         // '@typescript-eslint/no-inferrable-types':[0]
         '@typescript-eslint/no-explicit-any':[0]
-    }
+    },
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly",
+        "process": true
+    },
 }

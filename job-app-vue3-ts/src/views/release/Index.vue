@@ -1,18 +1,19 @@
 <template>
-  <div class="index-page">
+  <div class="relese-page">
     <HeaderLayout>
       <template #center>
-        <Space width="200" />
+        <Space width="200" class="PC" />
         <el-input v-model="input" placeholder="招聘季月薪10000+" size="large" />
         <Space width="20" />
-        <el-button type="primary" size="large" color="#626aef">搜索</el-button>
-        <Space width="200" />
+        <el-button type="primary" size="large" color="#626aef" @click="search">搜索</el-button>
+        <Space width="200" class="PC" />
+        <Space width="20" class="MOVE" />
       </template>
       <template #right>
         <el-button type="primary" size="large" color="#626aef" @click="toIndex">返回大厅</el-button>
       </template>
     </HeaderLayout>
-    <el-form :model="form" label-width="120px">
+    <el-form :model="form" label-width="80px">
       <el-form-item label="职位名称">
         <el-input v-model="form.name" placeholder="请选输入职位名称" />
       </el-form-item>
@@ -42,15 +43,15 @@
       </el-form-item>
       <el-form-item label="工作地点">
         <el-row justify="space-between">
-          <el-select v-model="form.province" placeholder="请选择省">
+          <el-select v-model="form.province" placeholder="请选择省" class="selectStyle">
             <el-option v-for="pro in provinceList" :key="pro.id" :label="pro.label" :value="pro.id" />
           </el-select>
           <Space width="10" />
-          <el-select v-model="form.city" placeholder="请选择市">
+          <el-select v-model="form.city" placeholder="请选择市" class="selectStyle">
             <el-option v-for="c in cityList" :key="c.id" :label="c.label" :value="c.id" />
           </el-select>
           <Space width="10" />
-          <el-select v-model="form.area" placeholder="请选择区">
+          <el-select v-model="form.area" placeholder="请选择区" class="selectStyle">
             <el-option v-for="a in areaList" :key="a.id" :label="a.label" :value="a.id" />
           </el-select>
         </el-row>
@@ -108,16 +109,23 @@ export default defineComponent({
           });
         });
     };
+    const search = () => {
+      ElMessageBox.alert("不好意思帅哥不能搜索", "提示", {
+        confirmButtonText: "滚",
+      });
+    };
     return {
       ...toRefs(data),
       toIndex,
       onSubmit,
+      search,
     };
   },
 });
 </script>
 <style lang="scss" scoped>
-.index-page {
+@import "@/style/global.scss";
+.relese-page {
   position: relative;
   width: 60%;
   left: 20%;
@@ -167,6 +175,22 @@ export default defineComponent({
       &:hover {
         background-color: rgba($color: #b8b3b3, $alpha: 0.1);
       }
+    }
+  }
+}
+@media screen and (max-width: $media-726) {
+  .relese-page {
+    position: relative;
+    width: 90%;
+    left: 5%;
+    .PC {
+      display: none;
+    }
+    .MOVE {
+      display: block;
+    }
+    .selectStyle {
+      margin-top: 5px;
     }
   }
 }
